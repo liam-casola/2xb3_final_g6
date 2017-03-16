@@ -2,6 +2,6 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="/Users/junnipan/Desktop/2xb3_final_g6/Rent_io/lib/opencsv-3.9.jar"/>
+	<classpathentry kind="lib" path="lib/opencsv-3.9.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
