@@ -1,47 +1,63 @@
 
-
-public class Apartment implements Comparable<Apartment>{
+public class Apartment {
+	private int year;
+	private String location;
+	private int population;
+	private String structure;
+	private String unit;
+	private String vector;
+	private String coordinate;
+	private double value;
 	
-	private String city;
-	private String province;
-	private String type;
-	private String value;
-	
-	public Apartment(String c, String p, String t, String v) {
-		this.city = c;
-		this.province = p;
-		this.type = t;
-		this.value = v;
+	public Apartment(
+					int year, 
+					String location, 
+					int population,
+					String structure,
+					String unit,
+					String vector,
+					String coordinate,
+					double value
+					) {
+		this.year = year;
+		this.location = location;
+		this.population = population;
+		this.structure = structure;
+		this.unit = unit;
+		this.vector = vector;
+		this.coordinate = coordinate;
+		this.value = value;
 	}
 	
-	public String getCity() {
-		return this.city;
+	public int getYear() {
+		return year;
 	}
 	
-	public String getProvince() {
-		return this.province;
+	public String getLocation() {
+		return location;
 	}
 	
-	public String getType() {
-		return this.type;
+	public int getPopulation() {
+		return population;
 	}
 	
-	public String getValue() {
-		return this.value;
-	}
-
-	@Override
-	public int compareTo(Apartment o) {
-		// TODO Auto-generated method stub
-		if(this.value.compareTo(o.value) < 0) {
-			return -1;
-		} else if(this.value.compareTo(o.value) > 0) {
-			return 1;
-		} else {
-			return 0;
-		}
+	public String getStructure() {
+		return structure;
 	}
 	
+	public String getUnit() {
+		return unit;
+	}
 	
+	public String getVector() {
+		return vector;
+	}
 	
+	public String getVCoordinate() {
+		return coordinate;
+	}
+	
+	public double getValue() {
+		return value;
+	}
 }
