@@ -5,8 +5,8 @@ public class Apartment {
 	private int population;
 	private String structure;
 	private String unit;
-	private String vector;
-	private String coordinate;
+	private double latitude;
+	private double longitude;
 	private double value;
 	
 	public Apartment(
@@ -15,8 +15,8 @@ public class Apartment {
 					int population,
 					String structure,
 					String unit,
-					String vector,
-					String coordinate,
+					double vector,
+					double coordinate,
 					double value
 					) {
 		this.year = year;
@@ -24,8 +24,8 @@ public class Apartment {
 		this.population = population;
 		this.structure = structure;
 		this.unit = unit;
-		this.vector = vector;
-		this.coordinate = coordinate;
+		this.latitude = vector;
+		this.longitude = coordinate;
 		this.value = value;
 	}
 	
@@ -49,12 +49,12 @@ public class Apartment {
 		return unit;
 	}
 	
-	public String getVector() {
-		return vector;
+	public double getLatitude() {
+		return latitude;
 	}
 	
-	public String getVCoordinate() {
-		return coordinate;
+	public double getLongitude() {
+		return longitude;
 	}
 	
 	public double getValue() {
