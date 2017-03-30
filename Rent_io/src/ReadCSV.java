@@ -51,7 +51,7 @@ public class ReadCSV {
 			lctn[i][1] = s[1];
 			lctn[i][2] = s[2];
 		}
-		
+
 		PDSlength = size(primaryDS);
 		//ignore the first line in the primary dataset
 		Apartment [] apts = new Apartment[PDSlength - 1];
@@ -81,6 +81,9 @@ public class ReadCSV {
 				s[7] = "0";
 			}
 			
+			if (i > 0 && !apts[i - 1].getLocation().equals(s[1].replace("\"", ""))) {
+				locationCounter++;
+			}
 			//check if the location changed
 			apts[i] = new Apartment(
 					Integer.parseInt(s[0]),
