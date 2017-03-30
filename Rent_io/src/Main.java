@@ -10,9 +10,7 @@ import javax.swing.*;
 public class Main {
 
 	public static void main(String[] args) throws IOException {
-		ReadCSV input = new ReadCSV("data/00270040-eng.csv");
-		Apartment[] apts = new Apartment[input.getLength()];
-		apts = input.readIn();
+		Apartment[] apts = ReadCSV.readIn();
 		JFrame f = new JFrame();
 		
 		/*
