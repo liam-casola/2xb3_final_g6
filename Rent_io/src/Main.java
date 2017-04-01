@@ -10,9 +10,11 @@ import javax.swing.*;
 public class Main {
 
 	public static void main(String[] args) throws IOException {
-		Apartment[] apts = ReadCSV.readIn();
-		JFrame f = new JFrame();
+		Town[] towns = ReadCSV.loadTowns();
+		System.out.println(towns[243].getLocation());
+		System.out.println(towns[243].getAptsList()[0].getYear());
 		
+		JFrame f = new JFrame();
 		/*
 		 * NOTE THE FOLLOWING BUTTONS ARE FOR SHOW
 		 */
@@ -40,9 +42,9 @@ public class Main {
 		//append rows of information to the text area
 		for (int  i = 0; i < 20; i++) {
 			tf.append(
-					apts[i+25889].getYear() + "\t" + 
-					apts[i+25889].getLocation() + "\t" + 
-					apts[i+25889].getValue() + "\n"
+					towns[i].getLocation() + "\t" + 
+					towns[i].getLatitude() + "\t" + 
+					towns[i].getLongitude() + "\n"
 					);
 		}
 		
