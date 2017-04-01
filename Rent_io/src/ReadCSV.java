@@ -38,25 +38,48 @@ public class ReadCSV {
 		return length = lines; //ignore the first line
 	}
 	
-	public static Apartment[] readIn() throws IOException {
-		//read in the locations into an array first
-		LDSlength = size(locationDS);
-		String[][] lctn = new String[LDSlength][3];
-		BufferedReader preReader = new BufferedReader(new FileReader(locationDS));
+	private static int[] jagSize() throws IOException {
+		int[] size = new int[LDSlength];
+		BufferedReader reader = new BufferedReader(new FileReader(primaryDS));
+		String previousName = null;;
 		String row;
-		for (int i = 0; i < LDSlength; i++) {
-			row = preReader.readLine();
+		row = reader.readLine(); //ignore the first line
+		int locationCounter = 0;
+		int counter = 0;
+		boolean lastItem = false;
+		
+		for (int i = 0; i < PDSlength - 1; i++) {
+			row = reader.readLine();
 			String[] s = row.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", -1);
-			lctn[i][0] = s[0];
-			lctn[i][1] = s[1];
-			lctn[i][2] = s[2];
+			
+			if (i > 0 && !previousName.equals(s[1].replace("\"", ""))) {
+				size[locationCounter] = counter;
+				locationCounter++;
+				counter = 0;
+			}
+			counter++;
+			previousName = s[1].replace("\"", "");
+			if (i == PDSlength - 2 ) {
+				size[locationCounter] = counter;
+			}
 		}
-
+		return size;
+	}
+	
+	private static Apartment[][] loadApartments() throws IOException {
 		PDSlength = size(primaryDS);
 		//ignore the first line in the primary dataset
-		Apartment [] apts = new Apartment[PDSlength - 1];
+		Apartment [][] apts = new Apartment[LDSlength][];
+		int[] inSize = jagSize();
+		
+		for (int i = 0; i < apts.length; i++) {
+			apts[i] = new Apartment[inSize[i]];
+		}
+		System.out.println(apts[243].length);
+		int jagCount = 0;
 		BufferedReader reader = new BufferedReader(new FileReader(primaryDS));
-		row = null;
+		String previousName = null;;
+		String row;
 		row = reader.readLine(); //ignore the first line
 		int locationCounter = 0;
 		for (int i = 0; i < PDSlength - 1; i++) {
@@ -72,30 +95,38 @@ public class ReadCSV {
 			
 			//some values contain ".." and "F"
 			try {
-				Double.parseDouble(s[5]);
-				Double.parseDouble(s[6]);
 				Double.parseDouble(s[7]);
 			} catch (NumberFormatException e) {
-				s[5] = "0";
-				s[6] = "0";
 				s[7] = "0";
 			}
 			
-			if (i > 0 && !apts[i - 1].getLocation().equals(s[1].replace("\"", ""))) {
-				locationCounter++;
-			}
 			//check if the location changed
-			apts[i] = new Apartment(
-					Integer.parseInt(s[0]),
-					s[1].replace("\"", ""),
-					Integer.parseInt(s[2]),
-					s[3],
-					s[4],
-					Double.parseDouble(lctn[locationCounter][1]),
-					Double.parseDouble(lctn[locationCounter][2]),
-					Double.parseDouble(s[7])
-					);
+			if (i > 0 && !previousName.equals(s[1].replace("\"", ""))) {
+				locationCounter++;
+				jagCount = 0;
+			}
+			previousName = s[1].replace("\"", "");
+			
+			//create the object
+			//System.out.println(i+previousName+" JC = "+jagCount+"\tLC = "+locationCounter);
+			apts[locationCounter][jagCount] = new Apartment(Integer.parseInt(s[0]), Integer.parseInt(s[2]), s[3], s[4], Double.parseDouble(s[7]));
+			jagCount++;
 		}
 		return apts;
+	}
+	
+	public static Town[] loadTowns() throws IOException {
+		LDSlength = size(locationDS);
+		Town [] towns = new Town[LDSlength];
+		Apartment[][] apts = loadApartments();
+		
+		BufferedReader reader = new BufferedReader(new FileReader(locationDS));
+		String row;
+		for (int i = 0; i < towns.length; i++) {
+			row = reader.readLine();
+			String[] s = row.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", -1);
+			towns[i] = new Town(s[0].replace("\"", ""), Double.parseDouble(s[1]), Double.parseDouble(s[2]), apts[i]);
+		}
+		return towns;
 	}
 }
