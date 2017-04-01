@@ -75,7 +75,7 @@ public class ReadCSV {
 		for (int i = 0; i < apts.length; i++) {
 			apts[i] = new Apartment[inSize[i]];
 		}
-		System.out.println(apts[243].length);
+
 		int jagCount = 0;
 		BufferedReader reader = new BufferedReader(new FileReader(primaryDS));
 		String previousName = null;;
