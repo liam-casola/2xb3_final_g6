@@ -47,18 +47,20 @@ public class Main {
 		for (Edge e : g.adj(cityIndex)) {
 			if (e.weight() < searchRadius) {
 				validTowns[validCounter] = towns[e.other(cityIndex)];
+				validCounter++;
 			}
 		}
 		/*
 		 * Grab the map image to use in the program based on current working location
 		 */
 		try {
+			//test using 150 and 200km
         	//swap longtitude and latitude based on input files, swap zoom, draw point based on locations (do the math based on current long/la)
-		String imageUrl = "https://maps.googleapis.com/maps/api/staticmap?center=" + towns[cityIndex].getLatitude() + ","+ towns[cityIndex].getLongitude() + "&zoom=4&size=612x612&scale=3&maptype=roadmap";
-            for (int i=0;i<validTowns.length;i++){
-            	imageUrl = imageUrl+ "&markers=color:blue%7Clabel:S%7C" + validTowns[i].getLatitude() +"," + validTowns[i].getLongitude();
+			String imageUrl = "https://maps.googleapis.com/maps/api/staticmap?center=" + towns[cityIndex].getLatitude() + ","+ towns[cityIndex].getLongitude() + "&zoom=7&size=612x612&scale=3&maptype=roadmap";
+            for (int i = 0; i < validTowns.length; i++){
+            	System.out.println(validTowns[i].getLocation());
+            	imageUrl = imageUrl + "&markers=color:red%7Clabel:"+validTowns[i].getLocation().substring(0,1)+"%7C" + validTowns[i].getLatitude() +"," + validTowns[i].getLongitude();
             }
-			
             String destinationFile = "image.jpg";
             String str = destinationFile;
             URL url = new URL(imageUrl);
