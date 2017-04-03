@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.util.Scanner;
 
 import javax.swing.*;
 
@@ -15,63 +16,45 @@ public class Main {
 
 		//initialize and fill the graph
 		Graph g = new Graph(towns.length);
-		for (int i = 0; i < towns.length; i++) {
-			for (int j = 0; j < towns.length; j++) {
-				if (i != j) {
+		for (int i = 0; i < towns.length - 1; i++) {
+			for (int j = i + 1; j < towns.length - i; j++) {
 					Edge e = new Edge(i, j, towns[i].distanceTo(towns[j]));
 					g.addEdge(e);
-				}
-			}
-		}
-		
-		//test distances in the graph narrowed down
-		System.out.println(towns[44].getLocation()+"\n-----------------");
-		for (Edge e : g.adj(44)) {
-			if (e.weight() < 150) {
-				System.out.println(towns[e.either()].getLocation());
 			}
 		}
 		
 		JFrame f = new JFrame();
-		/*
-		 * NOTE THE FOLLOWING BUTTONS ARE FOR SHOW
-		 */
-		//OK button
-		JButton b1 = new JButton("OK");
-		b1.setBounds(80, 350, 200, 30);
-		//Search button
-		JButton b2 = new JButton("Search");
-		b2.setBounds(320, 350, 200, 30);
 		
-		/*
-		 * NOTE THE FOLLOWING TEXT AREA IS FOR SHOW
-		 */
-		//instantiate a new mutliline text area
-		JTextArea tf = new JTextArea();
-		tf.setEditable(true);
+		Scanner reader = new Scanner(System.in);
+		System.out.println("Please enter the index of the central city");
+		int cityIndex = reader.nextInt();
+		System.out.println("You have seleced: "+towns[cityIndex].getLocation());
+		System.out.println("Please enter the search radius in km");
+		int searchRadius = reader.nextInt();
+		System.out.println("The following towns are within this area\n----------------------------------");
 		
-		f.add(b1);
-		f.add(b2);
-		f.add(tf);
-		
-		//add the header to the text area
-		tf.setText("Year\tTown/City\t\tAverage Value\n");
-		
-		//append rows of information to the text area
-		for (int  i = 0; i < 20; i++) {
-			tf.append(
-					towns[i].getLocation() + "\t" + 
-					towns[i].getLatitude() + "\t" + 
-					towns[i].getLongitude() + "\n"
-					);
+		int totalCities = 0;
+		for (Edge e : g.adj(cityIndex)) {
+			if (e.weight() < searchRadius) {
+				System.out.println(towns[e.other(cityIndex)].getLocation());
+				totalCities++;
+			}
 		}
 		
+		//create the array of valid towns to check
+		Town[] validTowns = new Town[totalCities];
+		int validCounter = 0;
+		for (Edge e : g.adj(cityIndex)) {
+			if (e.weight() < searchRadius) {
+				validTowns[validCounter] = towns[e.other(cityIndex)];
+			}
+		}
 		/*
 		 * Grab the map image to use in the program based on current working location
 		 */
 		try {
         	//swap longtitude and latitude based on input files, swap zoom, draw point based on locations (do the math based on current long/la)
-            String imageUrl = "https://maps.googleapis.com/maps/api/staticmap?center=43.259605,-79.9259135&zoom=14&size=612x612&scale=3&maptype=roadmap";
+            String imageUrl = "https://maps.googleapis.com/maps/api/staticmap?center="+towns[cityIndex].getLatitude()+","+towns[cityIndex].getLongitude()+"&zoom=14&size=612x612&scale=3&maptype=roadmap";
             String destinationFile = "image.jpg";
             String str = destinationFile;
             URL url = new URL(imageUrl);
