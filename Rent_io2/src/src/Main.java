@@ -54,7 +54,11 @@ public class Main {
 		 */
 		try {
         	//swap longtitude and latitude based on input files, swap zoom, draw point based on locations (do the math based on current long/la)
-            String imageUrl = "https://maps.googleapis.com/maps/api/staticmap?center="+towns[cityIndex].getLatitude()+","+towns[cityIndex].getLongitude()+"&zoom=14&size=612x612&scale=3&maptype=roadmap";
+		String imageUrl = "https://maps.googleapis.com/maps/api/staticmap?center=" + towns[cityIndex].getLatitude() + ","+ towns[cityIndex].getLongitude() + "&zoom=4&size=612x612&scale=3&maptype=roadmap";
+            for (int i=0;i<validTowns.length;i++){
+            	imageUrl = imageUrl+ "&markers=color:blue%7Clabel:S%7C" + validTowns[i].getLatitude() +"," + validTowns[i].getLongitude();
+            }
+			
             String destinationFile = "image.jpg";
             String str = destinationFile;
             URL url = new URL(imageUrl);
