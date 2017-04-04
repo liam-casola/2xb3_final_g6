@@ -24,18 +24,43 @@ public class Main {
 		}
 		
 		JFrame f = new JFrame();
+		int zoomLevel = 0;
 		
 		Scanner reader = new Scanner(System.in);
-		System.out.println("Please enter the index of the central city");
+		for (int i = 0; i < towns.length; i++) {
+			System.out.println("[" + i + "]" + towns[i].getLocation() + ",");
+		}
+		System.out.println("Please enter the index of the central Town");
 		int cityIndex = reader.nextInt();
 		System.out.println("You have seleced: "+towns[cityIndex].getLocation());
 		System.out.println("Please enter the search radius in km");
 		int searchRadius = reader.nextInt();
+		if (searchRadius > 2000) {
+			zoomLevel = 2;
+		} else if (searchRadius > 1000) {
+			zoomLevel = 4;
+		} else if (searchRadius > 210) {
+			zoomLevel = 6;
+		} else if (searchRadius > 140) {
+			zoomLevel = 7;
+		} else if (searchRadius > 50) {
+			zoomLevel = 8;
+		} else {
+			zoomLevel = 9;
+		}
+		
 		System.out.println("The following towns are within this area\n----------------------------------");
+		System.out.println("Marker\tDistance\tTown");
 		
 		int totalCities = 0;
 		for (Edge e : g.adj(cityIndex)) {
 			if (e.weight() < searchRadius) {
+				String cityLetter = String.valueOf((char)(totalCities + 65));
+				if (totalCities > 25) {
+					cityLetter = "*";
+				}
+				System.out.print( totalCities+ "\t");
+				System.out.print((int)e.weight() + "km\t");
 				System.out.println(towns[e.other(cityIndex)].getLocation());
 				totalCities++;
 			}
@@ -56,10 +81,9 @@ public class Main {
 		try {
 			//test using 150 and 200km
         	//swap longtitude and latitude based on input files, swap zoom, draw point based on locations (do the math based on current long/la)
-			String imageUrl = "https://maps.googleapis.com/maps/api/staticmap?center=" + towns[cityIndex].getLatitude() + ","+ towns[cityIndex].getLongitude() + "&zoom=7&size=612x612&scale=3&maptype=roadmap";
+			String imageUrl = "https://maps.googleapis.com/maps/api/staticmap?center=" + towns[cityIndex].getLatitude() + ","+ towns[cityIndex].getLongitude() + "&zoom="+zoomLevel+"&size=612x612&scale=3&maptype=roadmap";
             for (int i = 0; i < validTowns.length; i++){
-            	System.out.println(validTowns[i].getLocation());
-            	imageUrl = imageUrl + "&markers=color:red%7Clabel:"+validTowns[i].getLocation().substring(0,1)+"%7C" + validTowns[i].getLatitude() +"," + validTowns[i].getLongitude();
+            	imageUrl = imageUrl + "&markers=color:red%7Clabel:" + i + "%7C" + validTowns[i].getLatitude() +"," + validTowns[i].getLongitude();
             }
             String destinationFile = "image.jpg";
             String str = destinationFile;
@@ -92,6 +116,9 @@ public class Main {
 		//f.setLayout(null);
 		f.setVisible(true);
 		
+		System.out.println("Enter the number of the Town for more info");
+		int subCityInput = reader.nextInt();
+		ProcessRequest.currentPrices(validTowns[subCityInput]);
 	}
 
 }
