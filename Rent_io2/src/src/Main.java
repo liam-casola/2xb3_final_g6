@@ -182,6 +182,56 @@ public class Main {
 								text.setVisible(true);
 								textf.add(text);
 								textf.setVisible(true);
+								
+								
+								String[] priceRange = {"500-700", "700-900", "900-1100", "1100-1300", "1300-1500", "1500-1700", "1700-1900", "1900-2100"};
+								final JComboBox<String> priceDropDown = new JComboBox<String>(priceRange);
+								priceDropDown.setVisible(true);
+								text.add(priceDropDown);
+								JButton confirmPrice = new JButton("Start Search");
+								text.add(confirmPrice);
+								confirmPrice.setVisible(true);
+								text.setVisible(true);
+								confirmRadius.addActionListener(new ActionListener() {
+									
+									public void actionPerformed(ActionEvent e) {
+										text.add(priceDropDown);
+										text.add(confirmPrice);
+										textf.add(text);
+										f.setSize(501,1000);
+										f.setSize(503,1000);
+										f.setVisible(true);
+										text.setVisible(true);
+										for (int i=0;i<validTowns.length;i++){
+											for (int j=0; j<validTowns[i].getAptsList().length;j++){
+												if (validTowns[i].getAptsList()[j].getValue()> Integer.parseInt(((String)radiusDropDown.getSelectedItem()).split("-")[0]) && validTowns[i].getAptsList()[j].getValue()> Integer.parseInt(((String)radiusDropDown.getSelectedItem()).split("-")[1])){
+													JTextArea priceText = new JTextArea(10,38);
+													System.out.println(validTowns[i].getAptsList()[j].getValue());
+													priceText.append(""+validTowns[i].getAptsList()[j].getValue());
+													text.add(priceText);
+												}
+											}
+										}
+										textf.add(text);
+										map.add(priceDropDown);
+										map.add(confirmPrice);
+										f.setSize(503,1000);
+										f.setSize(501,1000);
+										f.setVisible(true);
+										map.setVisible(true);
+										
+								
+										
+										
+										
+									}
+									
+									
+									
+								});
+								
+								
+								
 							}
 					
 							
