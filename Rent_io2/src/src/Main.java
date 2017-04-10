@@ -152,8 +152,14 @@ public class Main {
 						map.add(new JLabel(new ImageIcon((new ImageIcon("image.jpg")).getImage().getScaledInstance(500, 550,   java.awt.Image.SCALE_SMOOTH))));
 						f.add(map);
 						f.setVisible(true);
+						JLabel sub1 = new JLabel("<html><br>Enter the method of sorting: </html>");
+						map.add(sub1);
+						String[] method = {"","all","price","price history"};
+						final JComboBox<String> methodDropDown = new JComboBox<String>(method);
+						map.add(methodDropDown);
 						JLabel sub = new JLabel("<html><br>Enter the number of the Town for more info: </html>");
 						map.add(sub);
+						f.add(map);
 						String[] cityNum = new String [validTowns.length];
 						for (int i=0;i<validTowns.length;i++){
 							cityNum[i] = "" + i;
@@ -167,68 +173,71 @@ public class Main {
 						map.setVisible(true);
 						confirmSubcity.addActionListener(new ActionListener() {
 							public void actionPerformed(ActionEvent eee) {
-								JFrame textf = new JFrame();
-								JPanel text = new JPanel();
-								textf.setSize(500, 1000);
-								int cityNumValue = Integer.parseInt((String)cityNumDropDown.getSelectedItem());
-								JTextArea details = new JTextArea(10, 38);
-								JScrollPane sp = new JScrollPane(details);
-								textf.getContentPane().add(sp);
-								text.add(sp);
-								sp.setVisible(true);
-								details.append(ProcessRequest.currentPrices(validTowns[cityNumValue]));
-								text.add(details);
-								details.setVisible(true);
-								text.setVisible(true);
-								textf.add(text);
-								textf.setVisible(true);
+								if (((String)methodDropDown.getSelectedItem()).equals("all")){
+									JFrame textf = new JFrame();
+									JPanel text = new JPanel();
+									textf.setSize(500, 1000);
+									int cityNumValue = Integer.parseInt((String)cityNumDropDown.getSelectedItem());
+									JTextArea details = new JTextArea(10, 38);
+									JScrollPane sp = new JScrollPane(details);
+									textf.getContentPane().add(sp);
+									text.add(sp);
+									sp.setVisible(true);
+									details.append(ProcessRequest.currentPrices(validTowns[cityNumValue]));
+									text.add(details);
+									details.setVisible(true);
+									text.setVisible(true);
+									textf.add(text);
+									textf.setVisible(true);
+								}
 								
-								
-								String[] priceRange = {"500-700", "700-900", "900-1100", "1100-1300", "1300-1500", "1500-1700", "1700-1900", "1900-2100"};
-								final JComboBox<String> priceDropDown = new JComboBox<String>(priceRange);
-								priceDropDown.setVisible(true);
-								text.add(priceDropDown);
-								JButton confirmPrice = new JButton("Start Search");
-								text.add(confirmPrice);
-								confirmPrice.setVisible(true);
-								text.setVisible(true);
-								confirmRadius.addActionListener(new ActionListener() {
+								if (((String)methodDropDown.getSelectedItem()).equals("price")){
+									JFrame textf = new JFrame();
+									JPanel text = new JPanel();
+									textf.setSize(700, 1000);
+									JTextArea details = new JTextArea(10, 38);
+									int cityNumValue = Integer.parseInt((String)cityNumDropDown.getSelectedItem());
 									
-									public void actionPerformed(ActionEvent e) {
-										text.add(priceDropDown);
-										text.add(confirmPrice);
-										textf.add(text);
-										f.setSize(501,1000);
-										f.setSize(503,1000);
-										f.setVisible(true);
-										text.setVisible(true);
-										for (int i=0;i<validTowns.length;i++){
-											for (int j=0; j<validTowns[i].getAptsList().length;j++){
-												if (validTowns[i].getAptsList()[j].getValue()> Integer.parseInt(((String)radiusDropDown.getSelectedItem()).split("-")[0]) && validTowns[i].getAptsList()[j].getValue()> Integer.parseInt(((String)radiusDropDown.getSelectedItem()).split("-")[1])){
-													JTextArea priceText = new JTextArea(10,38);
-													System.out.println(validTowns[i].getAptsList()[j].getValue());
-													priceText.append(""+validTowns[i].getAptsList()[j].getValue());
-													text.add(priceText);
-												}
-											}
+									String[] maxPrice = {"500", "700", "900", "1100", "1300", "1500", "1700", "1900"};
+									final JComboBox<String> priceDropDown = new JComboBox<String>(maxPrice);
+									priceDropDown.setVisible(true);
+									text.add(priceDropDown);
+									JButton confirmPrice = new JButton("Start Search");
+									text.add(confirmPrice);
+									confirmPrice.setVisible(true);
+									text.setVisible(true);
+									textf.setVisible(true);
+									textf.add(text);
+									confirmPrice.addActionListener(new ActionListener() {	
+										public void actionPerformed(ActionEvent e) {
+											details.append(ProcessRequest.priceLimit(validTowns[cityNumValue], Integer.parseInt((String)priceDropDown.getSelectedItem())));
+											text.add(details);
+											textf.add(text);
 										}
-										textf.add(text);
-										map.add(priceDropDown);
-										map.add(confirmPrice);
-										f.setSize(503,1000);
-										f.setSize(501,1000);
-										f.setVisible(true);
-										map.setVisible(true);
-										
+										});
+									
+								}
+								if (((String)methodDropDown.getSelectedItem()).equals("price history")){
+									JFrame textf = new JFrame();
+									JPanel text = new JPanel();
+									textf.setSize(1000, 1000);
+									int cityNumValue = Integer.parseInt((String)cityNumDropDown.getSelectedItem());
+									JTextArea details = new JTextArea(10, 38);
+									JScrollPane sp = new JScrollPane(details);
+									textf.getContentPane().add(sp);
+									text.add(sp);
+									sp.setVisible(true);
+									details.append(ProcessRequest.priceHistory(validTowns[cityNumValue]));
+									text.add(details);
+									details.setVisible(true);
+									text.setVisible(true);
+									textf.add(text);
+									textf.setVisible(true);
+								}
 								
-										
-										
-										
-									}
-									
-									
-									
-								});
+								
+								
+								
 								
 								
 								
