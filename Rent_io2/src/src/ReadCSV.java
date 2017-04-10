@@ -11,14 +11,17 @@ public class ReadCSV {
 	private static String locationDS = "data/LATandLNG.csv";
 	private static int LDSlength;
 	
+	//get the number of lines in the Primary Data Set (size() method needs to be run before this is called)
 	public int getPDSLength() {
 		return PDSlength;
 	}
 	
+	//get the numberof lines in the location data set (size() method needs to be run before this is called)
 	public int getLDSLength() {
 		return LDSlength;
 	}
 	
+	//given a filename, load the file and count how many lines it contains then return that value
 	private static int size(String filename) {
 		int lines = 0;
 		BufferedReader reader;
@@ -35,9 +38,11 @@ public class ReadCSV {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return lines; //ignore the first line
+		return lines;
 	}
 	
+	//determine the size of the array for each apartment array located in towns. This is a jagged array length as each
+	//town could have differerent amounts of recorded data
 	private static int[] jagSize() throws IOException {
 		int[] size = new int[LDSlength];
 		BufferedReader reader = new BufferedReader(new FileReader(primaryDS));
@@ -65,6 +70,8 @@ public class ReadCSV {
 		return size;
 	}
 	
+	//construct an array of apartment arrays using the jagged avlues determined from jagSize. Then populate each
+	//subarray with the apartments that are relevant
 	private static Apartment[][] loadApartments() throws IOException {
 		PDSlength = size(primaryDS);
 		//ignore the first line in the primary dataset
@@ -107,13 +114,14 @@ public class ReadCSV {
 			previousName = s[1].replace("\"", "");
 			
 			//create the object
-			//System.out.println(i+previousName+" JC = "+jagCount+"\tLC = "+locationCounter);
 			apts[locationCounter][jagCount] = new Apartment(Integer.parseInt(s[0]), Integer.parseInt(s[2]), s[3], s[4], Double.parseDouble(s[7]));
 			jagCount++;
 		}
 		return apts;
 	}
 	
+	//constrcut the array of towns by reading in their data from the latlng file and inserting all relevent
+	//apartment information into each one
 	public static Town[] loadTowns() throws IOException {
 		LDSlength = size(locationDS);
 		Town [] towns = new Town[LDSlength];
@@ -123,6 +131,7 @@ public class ReadCSV {
 		String row;
 		for (int i = 0; i < towns.length; i++) {
 			row = reader.readLine();
+			//splits a string on all ',' excluding ',' inside of a pair of ""
 			String[] s = row.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", -1);
 			towns[i] = new Town(s[0].replace("\"", ""), Double.parseDouble(s[1]), Double.parseDouble(s[2]), apts[i]);
 		}
