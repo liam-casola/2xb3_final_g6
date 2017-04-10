@@ -1,10 +1,15 @@
 package src;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.Array;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 
 import javax.swing.*;
@@ -24,16 +29,191 @@ public class Main {
 		}
 		
 		JFrame f = new JFrame();
-		int zoomLevel = 0;
-		
-		Scanner reader = new Scanner(System.in);
-		for (int i = 0; i < towns.length; i++) {
-			System.out.println("[" + i + "]" + towns[i].getLocation() + ",");
+		f.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+		//////////////////////////////
+		//////////////////////////////
+		JPanel map = new JPanel();
+		f.add(map);
+		f.setVisible(true);
+		JLabel start = new JLabel("<html>Please select your city: <br></html>");
+		map.add(start);
+		map.setVisible(true);
+		String[] choices = new String[towns.length+1];
+		choices[0] = " ";
+		for (int i=1;i<towns.length+1;i++){
+			choices[i] = towns[i-1].getLocation();
 		}
-		System.out.println("Please enter the index of the central Town");
-		int cityIndex = reader.nextInt();
-		System.out.println("You have seleced: "+towns[cityIndex].getLocation());
-		System.out.println("Please enter the search radius in km");
+
+		final JComboBox<String> cb = new JComboBox<String>(choices);
+		cb.setVisible(true);
+		map.add(cb);
+		Scanner reader = new Scanner(System.in);
+		f.pack();
+		f.setSize(502, 1000);
+
+		//////////////////////////////
+		//////////////////////////////
+		JButton updateLocation = new JButton("OK");
+		updateLocation.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				String youSelected = "You have seleced: "+ (String)cb.getSelectedItem();;
+				map.add(new JLabel(youSelected));
+				f.add(map);
+				f.setVisible(true);
+				map.setVisible(true);
+				String searchRadius = "<html>Please select the search radius (in km)<br></html>";
+				map.add(new JLabel(searchRadius));
+				String[] radius = {"50", "100", "150", "200", "250", "300", "350", "400", "500", "600", "700", "800", "900", "1000"};
+				final JComboBox<String> radiusDropDown = new JComboBox<String>(radius);
+				map.add(radiusDropDown);
+				radiusDropDown.setVisible(true);
+				JButton confirmRadius = new JButton("Start Search");
+				map.add(confirmRadius);
+				confirmRadius.setVisible(true);
+				map.setVisible(true);
+				confirmRadius.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						int zoomLevel = 0;
+						int searchRadius = Integer.parseInt((String)radiusDropDown.getSelectedItem());
+						if (searchRadius > 2000) {
+							zoomLevel = 2;
+						} else if (searchRadius > 1000) {
+							zoomLevel = 4;
+						} else if (searchRadius > 210) {
+							zoomLevel = 6;
+						} else if (searchRadius > 140) {
+							zoomLevel = 7;
+						} else if (searchRadius > 50) {
+							zoomLevel = 8;
+						} else {
+							zoomLevel = 9;
+						}
+						
+						JLabel townsHeading = new JLabel("<html>The following towns are within this area</br></html>");
+						map.add(townsHeading);
+						f.setVisible(true);
+
+						int totalCities = 0;
+						for (Edge edge : g.adj(Arrays.asList(choices).indexOf((String)cb.getSelectedItem()))) {
+							if (edge.weight() < searchRadius) {
+								String cityLetter = String.valueOf((char)(totalCities + 65));
+								if (totalCities > 25) {
+									cityLetter = "*";
+								}
+								Object row[]={totalCities,edge.weight(),towns[edge.other(Arrays.asList(choices).indexOf((String)cb.getSelectedItem()))].getLocation() };
+								JLabel cityData = new JLabel(totalCities+"       " + (int)edge.weight()+"km       " + towns[edge.other(Arrays.asList(choices).indexOf((String)cb.getSelectedItem()))].getLocation());
+								map.add(cityData);
+								/*
+								System.out.print( totalCities+ "\t");
+								System.out.print((int)edge.weight() + "km\t");
+								System.out.println(towns[edge.other(Arrays.asList(choices).indexOf((String)cb.getSelectedItem()))].getLocation());
+								*/
+								totalCities++;
+							}
+						}
+
+						//create the array of valid towns to check
+						Town[] validTowns = new Town[totalCities];
+						int validCounter = 0;
+						for (Edge ed : g.adj(Arrays.asList(choices).indexOf((String)cb.getSelectedItem()))) {
+							if (ed.weight() < searchRadius) {
+								validTowns[validCounter] = towns[ed.other(Arrays.asList(choices).indexOf((String)cb.getSelectedItem()))];
+								validCounter++;
+							}
+						}
+						try {
+							//test using 150 and 200km
+							//swap longtitude and latitude based on input files, swap zoom, draw point based on locations (do the math based on current long/la)
+							String imageUrl = "https://maps.googleapis.com/maps/api/staticmap?center=" + towns[Arrays.asList(choices).indexOf((String)cb.getSelectedItem())].getLatitude() + ","+ towns[Arrays.asList(choices).indexOf((String)cb.getSelectedItem())].getLongitude() + "&zoom="+zoomLevel+"&size=612x612&scale=3&maptype=roadmap";
+							for (int i = 0; i < validTowns.length; i++){
+								imageUrl = imageUrl + "&markers=color:red%7Clabel:" + i + "%7C" + validTowns[i].getLatitude() +"," + validTowns[i].getLongitude();
+							}
+							String destinationFile = "image.jpg";
+							String str = destinationFile;
+							URL url = new URL(imageUrl);
+							InputStream is = url.openStream();
+							OutputStream os = new FileOutputStream(destinationFile);
+
+							byte[] b = new byte[2048];
+							int length;
+
+							while ((length = is.read(b)) != -1) {
+								os.write(b, 0, length);
+							}
+
+							is.close();
+							os.close();
+						} catch (IOException er) {
+							er.printStackTrace();
+							System.exit(1);
+						}
+						//add the map image to the program
+						map.add(new JLabel(new ImageIcon((new ImageIcon("image.jpg")).getImage().getScaledInstance(500, 550,   java.awt.Image.SCALE_SMOOTH))));
+						f.add(map);
+						f.setVisible(true);
+						JLabel sub = new JLabel("<html><br>Enter the number of the Town for more info: </html>");
+						map.add(sub);
+						String[] cityNum = {" ", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14","15"};
+						final JComboBox<String> cityNumDropDown = new JComboBox<String>(cityNum);
+						map.add(cityNumDropDown);
+						JButton confirmSubcity = new JButton("Start");
+						map.add(confirmSubcity);
+						f.add(map);
+						f.setVisible(true);
+						map.setVisible(true);
+						confirmSubcity.addActionListener(new ActionListener() {
+							public void actionPerformed(ActionEvent eee) {
+								int cityNumValue = Integer.parseInt((String)cityNumDropDown.getSelectedItem());
+								JTextArea details = new JTextArea(10, 38);
+								JScrollPane sp = new JScrollPane(details);
+								f.getContentPane().add(sp);
+								sp.setBounds(10,60,780,500);
+								sp.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+								map.add(sp);
+								details.append(ProcessRequest.currentPrices(validTowns[cityNumValue]));
+								map.add(details);
+								details.setVisible(true);
+								map.setVisible(true);
+								f.add(map);
+								f.setVisible(true);
+							}
+					
+							
+						});
+						
+						
+						
+						
+						
+						
+
+
+
+		/*
+		 * Grab the map image to use in the program based on current working location
+		 */
+						
+						
+			/////////////
+						
+						
+
+					}
+				});
+				f.add(map);
+				f.setVisible(true);
+				
+				
+
+			}
+		});map.add(updateLocation);
+		f.add(map);
+		f.setVisible(true);
+		
+
+
+		/*
 		int searchRadius = reader.nextInt();
 		if (searchRadius > 2000) {
 			zoomLevel = 2;
@@ -51,9 +231,9 @@ public class Main {
 		
 		System.out.println("The following towns are within this area\n----------------------------------");
 		System.out.println("Marker\tDistance\tTown");
-		
 		int totalCities = 0;
-		for (Edge e : g.adj(cityIndex)) {
+		System.out.println(Arrays.asList(choices).indexOf((String)cb.getSelectedItem()));
+		for (Edge e : g.adj(Arrays.asList(choices).indexOf((String)cb.getSelectedItem()))) {
 			if (e.weight() < searchRadius) {
 				String cityLetter = String.valueOf((char)(totalCities + 65));
 				if (totalCities > 25) {
@@ -61,7 +241,7 @@ public class Main {
 				}
 				System.out.print( totalCities+ "\t");
 				System.out.print((int)e.weight() + "km\t");
-				System.out.println(towns[e.other(cityIndex)].getLocation());
+				System.out.println(towns[e.other(Arrays.asList(choices).indexOf((String)cb.getSelectedItem()))].getLocation());
 				totalCities++;
 			}
 		}
@@ -69,19 +249,20 @@ public class Main {
 		//create the array of valid towns to check
 		Town[] validTowns = new Town[totalCities];
 		int validCounter = 0;
-		for (Edge e : g.adj(cityIndex)) {
+		for (Edge e : g.adj(Arrays.asList(choices).indexOf((String)cb.getSelectedItem()))) {
 			if (e.weight() < searchRadius) {
-				validTowns[validCounter] = towns[e.other(cityIndex)];
+				validTowns[validCounter] = towns[e.other(Arrays.asList(choices).indexOf((String)cb.getSelectedItem()))];
 				validCounter++;
 			}
 		}
 		/*
 		 * Grab the map image to use in the program based on current working location
 		 */
+		/*
 		try {
 			//test using 150 and 200km
         	//swap longtitude and latitude based on input files, swap zoom, draw point based on locations (do the math based on current long/la)
-			String imageUrl = "https://maps.googleapis.com/maps/api/staticmap?center=" + towns[cityIndex].getLatitude() + ","+ towns[cityIndex].getLongitude() + "&zoom="+zoomLevel+"&size=612x612&scale=3&maptype=roadmap";
+			String imageUrl = "https://maps.googleapis.com/maps/api/staticmap?center=" + towns[Arrays.asList(choices).indexOf((String)cb.getSelectedItem())].getLatitude() + ","+ towns[Arrays.asList(choices).indexOf((String)cb.getSelectedItem())].getLongitude() + "&zoom="+zoomLevel+"&size=612x612&scale=3&maptype=roadmap";
             for (int i = 0; i < validTowns.length; i++){
             	imageUrl = imageUrl + "&markers=color:red%7Clabel:" + i + "%7C" + validTowns[i].getLatitude() +"," + validTowns[i].getLongitude();
             }
@@ -105,24 +286,23 @@ public class Main {
             System.exit(1);
         }
 		//add the map image to the program
-        f.add(new JLabel(new ImageIcon((new ImageIcon("image.jpg")).getImage().getScaledInstance(630, 600,   java.awt.Image.SCALE_SMOOTH))));
-		
+        map.add(new JLabel(new ImageIcon((new ImageIcon("image.jpg")).getImage().getScaledInstance(630, 600,   java.awt.Image.SCALE_SMOOTH))));
+		f.add(map);
+		*/
         //TO DO
         //add user input
+
+
         //add circle radius around each point on map based on input distance
         
-		f.pack();
-		f.setSize(720, 480);
+
 		//f.setLayout(null);
-		f.setVisible(true);
-		
+
+		/*
 		System.out.println("Enter the number of the Town for more info");
 		int subCityInput = reader.nextInt();
 		ProcessRequest.currentPrices(validTowns[subCityInput]);
-		ProcessRequest.priceHistory(validTowns[subCityInput]);
-		System.out.println("Enter your max price/month");
-		double maxPrice = reader.nextDouble();
-		ProcessRequest.priceLimit(validTowns[subCityInput], maxPrice);
+		*/
 	}
 
 }
