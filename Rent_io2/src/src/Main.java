@@ -154,7 +154,10 @@ public class Main {
 						f.setVisible(true);
 						JLabel sub = new JLabel("<html><br>Enter the number of the Town for more info: </html>");
 						map.add(sub);
-						String[] cityNum = {" ", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14","15"};
+						String[] cityNum = new String [validTowns.length];
+						for (int i=0;i<validTowns.length;i++){
+							cityNum[i] = "" + i;
+						}
 						final JComboBox<String> cityNumDropDown = new JComboBox<String>(cityNum);
 						map.add(cityNumDropDown);
 						JButton confirmSubcity = new JButton("Start");
@@ -164,19 +167,21 @@ public class Main {
 						map.setVisible(true);
 						confirmSubcity.addActionListener(new ActionListener() {
 							public void actionPerformed(ActionEvent eee) {
+								JFrame textf = new JFrame();
+								JPanel text = new JPanel();
+								textf.setSize(500, 1000);
 								int cityNumValue = Integer.parseInt((String)cityNumDropDown.getSelectedItem());
 								JTextArea details = new JTextArea(10, 38);
 								JScrollPane sp = new JScrollPane(details);
-								f.getContentPane().add(sp);
-								sp.setBounds(10,60,780,500);
-								sp.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-								map.add(sp);
+								textf.getContentPane().add(sp);
+								text.add(sp);
+								sp.setVisible(true);
 								details.append(ProcessRequest.currentPrices(validTowns[cityNumValue]));
-								map.add(details);
+								text.add(details);
 								details.setVisible(true);
-								map.setVisible(true);
-								f.add(map);
-								f.setVisible(true);
+								text.setVisible(true);
+								textf.add(text);
+								textf.setVisible(true);
 							}
 					
 							
