@@ -119,6 +119,10 @@ public class Main {
 		System.out.println("Enter the number of the Town for more info");
 		int subCityInput = reader.nextInt();
 		ProcessRequest.currentPrices(validTowns[subCityInput]);
+		ProcessRequest.priceHistory(validTowns[subCityInput]);
+		System.out.println("Enter your max price/month");
+		double maxPrice = reader.nextDouble();
+		ProcessRequest.priceLimit(validTowns[subCityInput], maxPrice);
 	}
 
 }
