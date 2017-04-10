@@ -7,36 +7,37 @@ public class Graph {
     private int E;
     private Bag<Edge>[] adj;
     
-    /**
-     * Initializes an empty edge-weighted graph with {@code V} vertices and 0 edges.
-     *
-     * @param  V the number of vertices
-     * @throws IllegalArgumentException if {@code V < 0}
-     */
+    //instantiates a new graph of with V verticies
     public Graph(int V) {
         if (V < 0) throw new IllegalArgumentException("Number of vertices must be nonnegative");
         this.V = V;
         this.E = 0;
+        //create the adjancy list using the Bag ADT from the lags 4 website. This list will be used to store all adjacent
+        //vertexe's for any given vertex
         adj = (Bag<Edge>[]) new Bag[V];
+        //initalize each Bag in the list
         for (int v = 0; v < V; v++) {
             adj[v] = new Bag<Edge>();
         }
     }
-
+    
+    //retunr the number of vertex's in the graph
     public int V() {
         return V;
     }
-
+    
+    //return the number of edges in the graph
     public int E() {
         return E;
     }
 
-    // throw an IllegalArgumentException unless {@code 0 <= v < V}
+    // verify that the vertex v exists inside the graph
     private void validateVertex(int v) {
         if (v < 0 || v >= V)
             throw new IllegalArgumentException("vertex " + v + " is not between 0 and " + (V-1));
     }
-
+    
+    //add a new weighted edge to the graph
     public void addEdge(Edge e) {
         int v = e.either();
         int w = e.other(v);
@@ -46,38 +47,20 @@ public class Graph {
         adj[w].add(e);
         E++;
     }
-
-    /**
-     * Returns the edges incident on vertex {@code v}.
-     *
-     * @param  v the vertex
-     * @return the edges incident on vertex {@code v} as an Iterable
-     * @throws IllegalArgumentException unless {@code 0 <= v < V}
-     */
+    
+    //retun all the edges stored in the bag  at the vertex v as an iterable
     public Iterable<Edge> adj(int v) {
         validateVertex(v);
         return adj[v];
     }
-
-    /**
-     * Returns the degree of vertex {@code v}.
-     *
-     * @param  v the vertex
-     * @return the degree of vertex {@code v}               
-     * @throws IllegalArgumentException unless {@code 0 <= v < V}
-     */
+    
+    //return the number of edges connected to the specified vertex v
     public int degree(int v) {
         validateVertex(v);
         return adj[v].size();
     }
-
-    /**
-     * Returns all edges in this edge-weighted graph.
-     * To iterate over the edges in this edge-weighted graph, use foreach notation:
-     * {@code for (Edge e : G.edges())}.
-     *
-     * @return all edges in this edge-weighted graph, as an iterable
-     */
+    
+    //return every edge in the graph as an iterable
     public Iterable<Edge> edges() {
         Bag<Edge> list = new Bag<Edge>();
         for (int v = 0; v < V; v++) {
@@ -97,27 +80,3 @@ public class Graph {
     }
 
 }
-
-/******************************************************************************
- *  Copyright 2002-2016, Robert Sedgewick and Kevin Wayne.
- *
- *  This file is part of algs4.jar, which accompanies the textbook
- *
- *      Algorithms, 4th edition by Robert Sedgewick and Kevin Wayne,
- *      Addison-Wesley Professional, 2011, ISBN 0-321-57351-X.
- *      http://algs4.cs.princeton.edu
- *
- *
- *  algs4.jar is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation, either version 3 of the License, or
- *  (at your option) any later version.
- *
- *  algs4.jar is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with algs4.jar.  If not, see http://www.gnu.org/licenses.
- ******************************************************************************/
